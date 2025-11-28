@@ -31,46 +31,29 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Custom metric cards */
-    .metric-card {
+    /* Style native Streamlit metrics */
+    [data-testid="stMetric"] {
         background: linear-gradient(145deg, #1e1e2f 0%, #2a2a4a 100%);
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 12px;
+        padding: 16px 20px;
         border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
-
-    .metric-value {
-        font-size: 42px;
+    [data-testid="stMetricValue"] {
+        font-size: 28px;
         font-weight: 700;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
+        color: #f093fb;
     }
 
-    .metric-label {
-        font-size: 14px;
+    [data-testid="stMetricLabel"] {
+        font-size: 12px;
         color: #8892b0;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-top: 8px;
+        letter-spacing: 1px;
     }
 
-    .metric-delta-positive {
-        color: #64ffda;
-        font-size: 14px;
-    }
-
-    .metric-delta-negative {
-        color: #ff6b6b;
-        font-size: 14px;
+    [data-testid="stMetricDelta"] {
+        font-size: 12px;
     }
 
     /* Header styling */
@@ -378,46 +361,45 @@ def main():
         st.error(f"Error loading data: {e}")
         return
 
-    # KPI Cards Row
+    # KPI Cards Row - using native st.metric for proper responsive layout
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         order_delta = stats['orders_this_month'] - stats['orders_last_month']
         delta_pct = round(100 * order_delta / max(stats['orders_last_month'], 1), 1)
-        st.markdown(render_metric_card(
-            f"{stats['orders_this_month']:,.0f}",
-            "Orders This Month",
-            f"{delta_pct}% vs last month",
-            "positive" if order_delta >= 0 else "negative"
-        ), unsafe_allow_html=True)
+        st.metric(
+            label="Orders This Month",
+            value=f"{stats['orders_this_month']:,.0f}",
+            delta=f"{delta_pct}% vs last month"
+        )
 
     with col2:
-        st.markdown(render_metric_card(
-            f"{stats['fulfillment_rate']:.1f}%",
-            "Fulfillment Rate",
-            delta_type="positive" if stats['fulfillment_rate'] > 85 else "negative"
-        ), unsafe_allow_html=True)
+        st.metric(
+            label="Fulfillment Rate",
+            value=f"{stats['fulfillment_rate']:.1f}%"
+        )
 
     with col3:
         days_display = stats['avg_days_to_ship'] if pd.notna(stats['avg_days_to_ship']) else 0
-        st.markdown(render_metric_card(
-            f"{days_display:.1f}",
-            "Avg Days to Ship"
-        ), unsafe_allow_html=True)
+        st.metric(
+            label="Avg Days to Ship",
+            value=f"{days_display:.1f}"
+        )
 
     with col4:
-        st.markdown(render_metric_card(
-            f"{stats['pending_this_month']:,.0f}",
-            "Pending Orders",
-            delta_type="negative" if stats['pending_this_month'] > 50 else "positive"
-        ), unsafe_allow_html=True)
+        st.metric(
+            label="Pending Orders",
+            value=f"{stats['pending_this_month']:,.0f}",
+            delta=f"{stats['pending_this_month']:,.0f} awaiting",
+            delta_color="inverse"
+        )
 
     with col5:
         shipping_k = stats['shipping_this_month'] / 1000 if pd.notna(stats['shipping_this_month']) else 0
-        st.markdown(render_metric_card(
-            f"${shipping_k:,.1f}K",
-            "Shipping Cost MTD"
-        ), unsafe_allow_html=True)
+        st.metric(
+            label="Shipping Cost MTD",
+            value=f"${shipping_k:,.1f}K"
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
