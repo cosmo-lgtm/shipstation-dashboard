@@ -21,9 +21,21 @@ st.set_page_config(
 # Dark mode custom CSS
 st.markdown("""
 <style>
-    /* Main background */
+    /* Force wide layout and prevent mobile collapse */
     .stApp {
         background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+        min-width: 1200px;
+    }
+
+    /* Force columns to stay horizontal */
+    [data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        gap: 1rem;
+    }
+
+    [data-testid="stColumn"] {
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
     }
 
     /* Hide Streamlit branding */
@@ -40,20 +52,23 @@ st.markdown("""
     }
 
     [data-testid="stMetricValue"] {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 700;
         color: #f093fb;
+        white-space: nowrap;
     }
 
     [data-testid="stMetricLabel"] {
-        font-size: 12px;
+        font-size: 11px;
         color: #8892b0;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
     }
 
     [data-testid="stMetricDelta"] {
-        font-size: 12px;
+        font-size: 11px;
+        white-space: nowrap;
     }
 
     /* Header styling */
